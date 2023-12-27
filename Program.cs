@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IStorageService, StorageService>();
 //builder.Services.AddSingleton<IAppConfiguration, AppConfiguration>();
 builder.Services.ConfigureJWT(true, "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp3CVbF+TZDrO6IjeFIsbWhi4vjxkLrPy2ygWBbXse7ycd2daJrFXzKmlWECrSw7wbBcv4KO0PFVtb9s5PCJGmDZOZR02xY8DgUauU+S1EWEjmEdjeC8puEOPoM/YauNWWqAtJt8146WNTN07/UsvH7YZogKcmrl7PgmEMQtHhHYCWuoe+/27Mm4UffaIWIWrdVw970SFQ2PPAYns8j9NxWHMXUQZFewEKn1mw7RrByiP99PIOMoS7GtvnkWSls9VEXrsYelVjTEaXKiaKHYX6trzP4Zg9odOTMlULmeRLYs4lVCBC/lAg/BzM+3h/3I/1xLWy9S0sfwj3YCTboBL5wIDAQAB");
-
+builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

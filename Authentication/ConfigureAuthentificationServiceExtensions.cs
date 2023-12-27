@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace MeganUploadFiles.Authentication
 {
@@ -15,56 +17,20 @@ namespace MeganUploadFiles.Authentication
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             });
 
-            AuthenticationBuilder.AddJwtBearer(o =>
+            AuthenticationBuilder.AddJwtBearer(options =>
             {
-
-                #region == JWT Token Validation ===
-                o.TokenValidationParameters = new TokenValidationParameters
+                options.Authority = "https://your-keycloak-server/auth/realms/your-realm";
+                options.Audience = "your-client-id";
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateAudience = false,
                     ValidateIssuer = true,
-                    ValidIssuers = new[] { "http://localhost:8080/realms/MyRealm" },
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = BuildRSAKey(publicKeyJWT),
-                    ValidateLifetime = true
+                    ClockSkew = TimeSpan.Zero,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-client-secret"))
                 };
-                #endregion
-                #region === Event Authentification Handlers ===
-                o.Events = new JwtBearerEvents()
-                {
-                    OnTokenValidated = c =>
-                    {
-                        Console.WriteLine("User successfully authenticated");
-                        return Task.CompletedTask;
-                    },
-                    OnAuthenticationFailed = c =>
-                    {
-                        c.NoResult();
-                        c.Response.StatusCode = 500;
-                        c.Response.ContentType = "text/plain";
-                        if (IsDevelopment)
-                        {
-                            return c.Response.WriteAsync(c.Exception.ToString());
-                        }
-                        return c.Response.WriteAsync("An error occured processing your authentication.");
-                    }
-                };
-                #endregion
             });
-        }
-        private static RsaSecurityKey BuildRSAKey(string publicKeyJWT)
-        {
-            RSA rsa = RSA.Create();
-
-            rsa.ImportSubjectPublicKeyInfo(
-
-                source: Convert.FromBase64String(publicKeyJWT),
-                bytesRead: out _
-            );
-
-            var IssuerSigningKey = new RsaSecurityKey(rsa);
-
-            return IssuerSigningKey;
         }
     }
 }
